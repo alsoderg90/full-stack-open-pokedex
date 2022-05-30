@@ -21,6 +21,12 @@ jobs:
         run: npm run eslint
       - name: build
         run: npm run build
+      - uses: rjstone/discord-webhook-notify@v1
+        if: ${{ failure() }}
+        with:
+            severity: error
+            text: Build failed
+            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
       - name: test
         run: npm run test
       - name: e2e tests
@@ -41,12 +47,17 @@ jobs:
           healthcheck: "https://fullstack-pokedex-alsoderg.herokuapp.com/health"
           checkstring: "ok"
           rollbackonhealthcheckfailed: true
-      - uses: actions/checkout@v2
+      - name: Success
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ success() }}
+        with:
+          severity: info
+          details: New version of https://fullstack-pokedex-alsoderg.herokuapp.com/ deployment succeeded
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
   tag_release:
       needs: [simple_deployment_pipeline]
       runs-on: ubuntu-20.04
       steps:
-      - uses: actions/checkout@v2
       - name: Bump version and push tag
         uses: anothrNick/github-tag-action@1.36.0
         env:
