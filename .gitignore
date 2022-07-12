@@ -1,5 +1,6 @@
 dist/
 node_modules/
+cypress/videos/
 authorizations.txt
 
 muistiinpanot.txt
